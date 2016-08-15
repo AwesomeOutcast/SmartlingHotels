@@ -15,16 +15,20 @@ app.set('view engine', 'ejs');
 
 /* Fields */
 var nav = JSON.parse(require('fs').readFileSync('./data/strings/en/nav.json', 'utf8'));
+var meta = JSON.parse(require('fs').readFileSync('./data/strings/en/meta.json', 'utf8'));
 var data = JSON.parse(require('fs').readFileSync('./data/strings/en/data.json', 'utf8'));
 var hotels = JSON.parse(require('fs').readFileSync('./data/strings/en/hotels.json', 'utf8'));
 var locations = JSON.parse(require('fs').readFileSync('./data/strings/en/locations.json', 'utf8'));
-var descriptions = JSON.parse(require('fs').readFileSync('./data/strings/en/meta.json', 'utf8'));
 /* Fields */
 
+/* Hotel Results */
 app.get('/browse/:city', function (request, response) {
     var city = request.params.city;
     var results = [];
+    var titleText = "";
     var description = "";
+
+
     for (var i = 0; i < hotels.length; i++) {
         var hotel = hotels[i];
         if (hotel.prevLink.toLowerCase() === city.toLowerCase()) {
@@ -32,62 +36,116 @@ app.get('/browse/:city', function (request, response) {
         }
     }
     if (results.length > 0) {
-        description = descriptions.browse.results + results[0].address.city + ", " + results[0].address.state;
+        titleText = meta.browse.titleText;
+        description = meta.browse.results + results[0].address.city + ", " + results[0].address.state;
         response.render('pages/hotel_results', {
             nav: nav,
             hotels: results,
             locations: locations,
             city: city,
+            titleText: titleText,
             description: description
+
         });
     }
     else {
         results = 0;
-        description = descriptions.results404;
+        titleText = meta.results404.titleText;
+        description = meta.results404.description;
         response.render('pages/results404', {
             nav: nav,
             locations: locations,
             city: city,
             results: results,
+            titleText: titleText,
             description: description
         });
     }
 });
 
+/* About Us */
 app.get('/about_us', function (request, response) {
-    var titleTxt = nav.about_us.text;
+    var titleText = meta.about_us.titleText;
+    var description = meta.about_us.description;
     var data2 = data.about_us;
-    var description = descriptions.about_us;
-    response.render('pages/page', {nav: nav, data: data2, titleTxt: titleTxt, description: description});
+    response.render('pages/page', {nav: nav, titleText: titleText, description: description, data: data2});
 });
 
+/* Browse */
 app.get('/browse', function (request, response) {
-    var description = descriptions.browse.default;
-    response.render('pages/browse', {nav: nav, locations: locations, description: description});
+    var titleText = meta.browse.titleText;
+    var description = meta.browse.description;
+    response.render('pages/browse', {nav: nav, locations: locations, titleText: titleText, description: description});
 });
 
+/* Site Map */
 app.get('/site_map', function (request, response) {
-    var titleTxt = nav.site_map.text;
+    var titleText = meta.site_map.titleText;
+    var description = meta.site_map.description;
     var data2 = data.site_map;
-    var description = descriptions.site_map;
-    response.render('pages/page', {nav: nav, data: data2, titleTxt: titleTxt, description: description});
+    response.render('pages/page', {nav: nav, titleText: titleText, description: description, data: data2});
 });
 
+/* Support */
 app.get('/support', function (request, response) {
-    var titleTxt = nav.support.text;
+    var titleText = meta.support.titleText;
+    var description = meta.support.description;
     var data2 = data.support;
-    var description = descriptions.support;
-    response.render('pages/page', {nav: nav, data: data2, titleTxt: titleTxt, description: description});
+    response.render('pages/page', {nav: nav, titleText: titleText, description: description, data: data2});
 });
 
-app.get('/:hotelPath', function (request, response) {
+/* Checkout */
+app.get('/:hotelPath/book?', function (request, response) {
     var hotelPath = request.params.hotelPath;
     var currentHotel = {};
+    var titleText = "";
     var description = "";
     for (var i = 0; i < hotels.length; i++) {
         var hotel = hotels[i];
         if (hotel.link.toLowerCase() === hotelPath.toLowerCase()) {
             currentHotel = hotel;
+        }
+    }
+    if (Object.keys(currentHotel).length > 0) {
+        var formData = {
+            "firstName": request.query.firstName,
+            "lastName": request.query.lastName,
+            "email": request.query.email,
+            "nights": request.query.nights
+        };
+        titleText = meta.checkout.titleText;
+        description = meta.checkout.description;
+
+        response.render('pages/checkout', {
+            nav: nav,
+            hotel: currentHotel,
+            titleText: titleText,
+            description: description,
+            formData: formData
+        });
+    } else {
+        titleText = meta.checkout404.titleText;
+        description = meta.checkout404.description;
+        response.render('pages/page404', {
+            nav: nav,
+            locations: locations,
+            titleText: titleText,
+            description: description
+        });
+    }
+});
+
+/* Hotel Page */
+app.get('/:hotelPath', function (request, response) {
+    var hotelPath = request.params.hotelPath;
+    var currentHotel = {};
+    var titleText = "";
+    var description = "";
+    for (var i = 0; i < hotels.length; i++) {
+        var hotel = hotels[i];
+        if (hotel.link.toLowerCase() === hotelPath.toLowerCase()) {
+            currentHotel = hotel;
+            titleText = currentHotel.name + " | SmartlingHotels";
             description = hotel.description1;
         }
     }
@@ -96,13 +154,21 @@ app.get('/:hotelPath', function (request, response) {
             nav: nav,
             hotel: currentHotel,
             locations: locations,
+            titleText: titleText,
             description: description
         });
     } else {
-        description = descriptions.page404;
-        response.render('pages/page404', {nav: nav, locations: locations, description: description});
+        titleText = meta.page404.titleText;
+        description = meta.page404.description;
+        response.render('pages/page404', {
+            nav: nav,
+            locations: locations,
+            titleText: titleText,
+            description: description
+        });
     }
 });
+
 
 /*
  app.get('/:language/', function(request, response) {
@@ -112,10 +178,12 @@ app.get('/:hotelPath', function (request, response) {
  });
  */
 
-
+/* Index */
 app.get('/', function (request, response) {
-    var description = descriptions.index;
-    response.render('pages/index', {nav: nav, data: data, description: description});
+    var titleText = meta.index.titleText
+    var data2 = data;
+    var description = meta.index.description;
+    response.render('pages/index', {nav: nav, data: data2, titleText: titleText, description: description});
 });
 
 
