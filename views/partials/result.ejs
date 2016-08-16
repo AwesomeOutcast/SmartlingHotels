@@ -9,13 +9,11 @@
             <div class="col-md-5">
                 <div class="h3"><%= hotel.name %></div>
                 <div class="h4">Location: <br>
-                    <span class="notranslate">
-                        <small>
-                            <%= hotel.address.compiled_ln1%>
-                            <br>
-                            <%= hotel.address.compiled_ln2%>
-                        </small>
-                    </span>
+                    <address style="font-size: small;">
+                        <%= hotel.address.compiled_ln1 %><br>
+                        <%= hotel.address.compiled_ln2 %><br>
+                    </address>
+
                 </div>
                 <%- hotel.description1 %>
                 <a class="btn btn-primary" href="/<%= hotel.link %>">Check Room Availability<span

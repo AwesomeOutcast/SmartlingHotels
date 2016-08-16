@@ -18,6 +18,7 @@ var nav = JSON.parse(require('fs').readFileSync('./data/strings/en/nav.json', 'u
 var meta = JSON.parse(require('fs').readFileSync('./data/strings/en/meta.json', 'utf8'));
 var data = JSON.parse(require('fs').readFileSync('./data/strings/en/data.json', 'utf8'));
 var hotels = JSON.parse(require('fs').readFileSync('./data/strings/en/hotels.json', 'utf8'));
+var checkout = JSON.parse(require('fs').readFileSync('./data/strings/en/checkout.json', 'utf8'));
 var locations = JSON.parse(require('fs').readFileSync('./data/strings/en/locations.json', 'utf8'));
 /* Fields */
 
@@ -119,6 +120,7 @@ app.get('/:hotelPath/book?', function (request, response) {
         response.render('pages/checkout', {
             nav: nav,
             hotel: currentHotel,
+            checkout: checkout,
             titleText: titleText,
             description: description,
             formData: formData
