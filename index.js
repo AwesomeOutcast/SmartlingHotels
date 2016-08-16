@@ -2,6 +2,12 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var url = require('url');
+var Gettext = require('node-gettext');
+var sprintf = require('sprintf');
+var fs = require('fs');
+var locale = require('locale');
+var gt = new Gettext();
+
 
 // Set port for the app to run on
 app.set('port', (process.env.PORT || 5000));
@@ -13,13 +19,34 @@ app.use(express.static('public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+// Set supported localesd
+var supportedLocales = ["en", "es"];
+app.use(locale(supportedLocales));
+
+
+/*
+var fileContentsEnglish = fs.readFileSync("./translations/en.po");
+gt.addTextdomain("en", fileContentsEnglish);
+var fileContentsSpanish = fs.readFileSync("./translations/es.po");
+gt.addTextdomain("es", fileContentsSpanish);
+*/
+
+// Let EJS templates use Gettext and sprintf
+app.use(function(req, res, next) {
+    gt.textdomain(req.locale);
+    res.locals.gt = gt;
+    res.locals.sprintf = sprintf;
+    next();
+});
+
+
 /* Fields */
-var nav = JSON.parse(require('fs').readFileSync('./data/strings/en/nav.json', 'utf8'));
-var meta = JSON.parse(require('fs').readFileSync('./data/strings/en/meta.json', 'utf8'));
-var data = JSON.parse(require('fs').readFileSync('./data/strings/en/data.json', 'utf8'));
-var hotels = JSON.parse(require('fs').readFileSync('./data/strings/en/hotels.json', 'utf8'));
-var checkout = JSON.parse(require('fs').readFileSync('./data/strings/en/checkout.json', 'utf8'));
-var locations = JSON.parse(require('fs').readFileSync('./data/strings/en/locations.json', 'utf8'));
+var nav = JSON.parse.fs.readFileSync('./data/strings/en/nav.json', 'utf8');
+var meta = JSON.parse.fs.readFileSync('./data/strings/en/meta.json', 'utf8');
+var data = JSON.parse.fs.readFileSync('./data/strings/en/data.json', 'utf8');
+var hotels = JSON.parse.fs.readFileSync('./data/strings/en/hotels.json', 'utf8');
+var checkout = JSON.parse.fs.readFileSync('./data/strings/en/checkout.json', 'utf8');
+var locations = JSON.parse.fs.readFileSync('./data/strings/en/locations.json', 'utf8');
 /* Fields */
 
 /* Hotel Results */
@@ -73,7 +100,7 @@ app.get('/about_us', function (request, response) {
 });
 
 /* Browse */
-app.get('/browse', function (request, response) {
+app.get('/browse',function (request, response) {
     var titleText = meta.browse.titleText;
     var description = meta.browse.description;
     response.render('pages/browse', {nav: nav, locations: locations, titleText: titleText, description: description});

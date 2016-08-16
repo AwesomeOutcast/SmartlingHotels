@@ -9,7 +9,10 @@
   "dependencies": {
     "ejs": "2.3.3",
     "express": "4.13.3",
-    "body-parser": "latest"
+    "body-parser": "latest",
+    "sprintf": "^0.1.5",
+    "locale": "^0.1.0",
+    "node-gettext": "latest"
   },
   "engines": {
     "node": "0.12.7"
@@ -23,5 +26,10 @@
     "heroku",
     "express"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-shell": "^0.5.2",
+    "jsxgettext": "^0.8.2"
+  }
 }
