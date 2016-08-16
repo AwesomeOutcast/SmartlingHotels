@@ -8,6 +8,14 @@
         .carousel-inner > .item > img {
             margin: 0 auto;
         }
+
+        .modal-dialog{
+            position: relative;
+            overflow-y: auto;
+            overflow-x: auto;
+            max-width: fit-content;
+            min-width: 300px;
+        }
     </style>
 
 </head>
@@ -22,9 +30,9 @@
             <% include ../partials/carousel_template.ejs %>
             <br>
             <div class="row">
-                <div class="" style="text-align: center; font-weight: 700; font-size: 185%;">
+                <div style="text-align: center; font-weight: 700; font-size: 185%;">
                     <%= hotel.rooms %> rooms available with prices starting at:
-                    <span style="color: red; font-weight: 700; text-decoration: underline;">
+                    <span style="color: red; text-decoration: underline;">
                         $<%= hotel.price %> per night
                     </span>
                 </div>
